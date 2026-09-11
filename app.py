@@ -86,7 +86,6 @@ m = folium.Map(
     location=[default_lat, default_lon],
     zoom_start=13
 )
-
 map_data = st_folium(
     m,
     width=1000,
@@ -95,6 +94,32 @@ map_data = st_folium(
 
 if map_data and map_data["last_clicked"]:
 
+    selected_lat = map_data["last_clicked"]["lat"]
+    selected_lon = map_data["last_clicked"]["lng"]
+
+    # Add pin at selected location
+    selected_map = folium.Map(
+        location=[selected_lat, selected_lon],
+        zoom_start=15
+    )
+
+    folium.Marker(
+        [selected_lat, selected_lon],
+        tooltip="📍 Selected Flood Location",
+        popup=f"Location: {selected_lat:.6f}, {selected_lon:.6f}",
+        icon=folium.Icon(color="red", icon="info-sign")
+    ).add_to(selected_map)
+
+    st_folium(
+        selected_map,
+        width=1000,
+        height=500
+    )
+
+    st.success("📍 Location Selected")
+
+    st.write(f"**Latitude:** {selected_lat:.6f}")
+    st.write(f"**Longitude:** {selected_lon:.6f}")
     selected_lat = map_data["last_clicked"]["lat"]
     selected_lon = map_data["last_clicked"]["lng"]
 
