@@ -124,7 +124,7 @@ st.success("📍 Location Selected")
 
 st.write(f"**Latitude:** {st.session_state.selected_lat:.6f}")
 st.write(f"**Longitude:** {st.session_state.selected_lon:.6f}")
-    st.header("💡 Recommended Action")
+st.header("💡 Recommended Action")
 
 if probability >= 0.65:
     st.markdown("""
