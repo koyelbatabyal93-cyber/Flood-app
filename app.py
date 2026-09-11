@@ -77,46 +77,50 @@ comparison = pd.DataFrame({
 })
 st.bar_chart(comparison.set_index("Parameter"))
 
-st.header("🗺️ Example Flood Risk Zones")
+st.header("🗺️ Select Flood Location")
 
-zones = pd.DataFrame({
-    "Area": ["Zone A", "Zone B", "Zone C", "Zone D", "Zone E"],
-    "Latitude": [22.5726, 22.5750, 22.5680, 22.5800, 22.5650],
-    "Longitude": [88.3639, 88.3700, 88.3550, 88.3600, 88.3750],
-    "Risk": ["High", "Medium", "Low", "High", "Medium"]
-})
+default_lat = 22.5726
+default_lon = 88.3639
 
 m = folium.Map(
-    location=[22.5726, 88.3639],
+    location=[default_lat, default_lon],
     zoom_start=13
 )
 
-risk_colors = {
-    "High": "red",
-    "Medium": "orange",
-    "Low": "green"
-}
-
-selected_zone = st.selectbox("📍 Select Area", zones["Area"])
-
-selected = zones[zones["Area"] == selected_zone].iloc[0]
-
-m = folium.Map(
-    location=[selected["Latitude"], selected["Longitude"]],
-    zoom_start=15
+map_data = st_folium(
+    m,
+    width=1000,
+    height=500
 )
 
-folium.CircleMarker(
-    location=[selected["Latitude"], selected["Longitude"]],
-    radius=15,
-    color=risk_colors[selected["Risk"]],
-    fill=True,
-    fill_color=risk_colors[selected["Risk"]],
-    fill_opacity=0.8,
-    popup=f"{selected['Area']} - {selected['Risk']} Risk"
-).add_to(m)
+if map_data and map_data["last_clicked"]:
 
-st_folium(m, width=1000, height=500)
+    selected_lat = map_data["last_clicked"]["lat"]
+    selected_lon = map_data["last_clicked"]["lng"]
+
+    st.success("📍 Location Selected")
+
+    st.write(f"**Latitude:** {selected_lat:.6f}")
+    st.write(f"**Longitude:** {selected_lon:.6f}")
+
+    st.header("📊 Flood Prediction Result")
+
+    st.write(
+        f"📍 **Selected Location:** "
+        f"{selected_lat:.6f}, {selected_lon:.6f}"
+    )
+
+    st.write(f"🌊 **Flood Risk:** {probability * 100:.2f}%")
+
+    if probability >= 0.65:
+        st.error("🚨 HIGH FLOOD RISK")
+    elif probability >= 0.35:
+        st.warning("⚠️ MEDIUM FLOOD RISK")
+    else:
+        st.success("✅ LOW FLOOD RISK")
+
+else:
+    st.info("👆 Please click on the map to select a location.")
 
 st.header("💡 Recommended Action")
 if probability >= 0.65:
