@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
-from sklearn.ensemble import RandomForestClassifier
-
+from sklearn.ensemble import 
+RandomForestClassifier
+import folium
+from streamlit_folium import st_folium
 st.set_page_config(
     page_title="Urban Flood Nowcasting System",
     page_icon="🌧️",
@@ -77,14 +79,37 @@ comparison = pd.DataFrame({
 st.bar_chart(comparison.set_index("Parameter"))
 
 st.header("🗺️ Example Flood Risk Zones")
+
 zones = pd.DataFrame({
-    "Area": ["Zone A","Zone B","Zone C","Zone D","Zone E"],
-    "Latitude": [22.5726,22.5750,22.5680,22.5800,22.5650],
-    "Longitude": [88.3639,88.3700,88.3550,88.3600,88.3750],
-    "Risk": ["High","Medium","Low","High","Medium"]
+    "Area": ["Zone A", "Zone B", "Zone C", "Zone D", "Zone E"],
+    "Latitude": [22.5726, 22.5750, 22.5680, 22.5800, 22.5650],
+    "Longitude": [88.3639, 88.3700, 88.3550, 88.3600, 88.3750],
+    "Risk": ["High", "Medium", "Low", "High", "Medium"]
 })
-st.dataframe(zones, use_container_width=True)
-st.map(zones, latitude="Latitude", longitude="Longitude")
+
+m = folium.Map(
+    location=[22.5726, 88.3639],
+    zoom_start=13
+)
+
+risk_colors = {
+    "High": "red",
+    "Medium": "orange",
+    "Low": "green"
+}
+
+for _, row in zones.iterrows():
+    folium.CircleMarker(
+        location=[row["Latitude"], row["Longitude"]],
+        radius=10,
+        color=risk_colors[row["Risk"]],
+        fill=True,
+        fill_color=risk_colors[row["Risk"]],
+        fill_opacity=0.8,
+        popup=f"{row['Area']} - {row['Risk']} Risk"
+    ).add_to(m)
+
+st_folium(m, width=1000, height=500)
 
 st.header("💡 Recommended Action")
 if probability >= 0.65:
