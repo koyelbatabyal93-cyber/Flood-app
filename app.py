@@ -79,77 +79,51 @@ st.bar_chart(comparison.set_index("Parameter"))
 
 st.header("🗺️ Select Flood Location")
 
-default_lat = 22.5726
-default_lon = 88.3639
+if "selected_lat" not in st.session_state:
+    st.session_state.selected_lat = 22.5726
+    st.session_state.selected_lon = 88.3639
 
 m = folium.Map(
-    location=[default_lat, default_lon],
+    location=[
+        st.session_state.selected_lat,
+        st.session_state.selected_lon
+    ],
     zoom_start=13
 )
+
+folium.Marker(
+    [
+        st.session_state.selected_lat,
+        st.session_state.selected_lon
+    ],
+    popup="Selected Location",
+    tooltip="📍 Selected Location",
+    icon=folium.Icon(color="red", icon="info-sign")
+).add_to(m)
+
 map_data = st_folium(
     m,
     width=1000,
-    height=500
+    height=500,
+    key="flood_map"
 )
 
-if map_data and map_data["last_clicked"]:
+if map_data and map_data.get("last_clicked"):
+    lat = map_data["last_clicked"]["lat"]
+    lon = map_data["last_clicked"]["lng"]
 
-    selected_lat = map_data["last_clicked"]["lat"]
-    selected_lon = map_data["last_clicked"]["lng"]
+    if (
+        lat != st.session_state.selected_lat
+        or lon != st.session_state.selected_lon
+    ):
+        st.session_state.selected_lat = lat
+        st.session_state.selected_lon = lon
+        st.rerun()
 
-    # Add pin at selected location
-    selected_map = folium.Map(
-        location=[selected_lat, selected_lon],
-        zoom_start=15
-    )
+st.success("📍 Location Selected")
 
-    folium.Marker(
-        [selected_lat, selected_lon],
-        tooltip="📍 Selected Flood Location",
-        popup=f"Location: {selected_lat:.6f}, {selected_lon:.6f}",
-        icon=folium.Icon(color="red", icon="info-sign")
-    ).add_to(selected_map)
-
-    st_folium(
-        selected_map,
-        width=1000,
-        height=500
-    )
-
-    st.success("📍 Location Selected")
-
-    st.write(f"**Latitude:** {selected_lat:.6f}")
-    st.write(f"**Longitude:** {selected_lon:.6f}")
-    selected_lat = map_data["last_clicked"]["lat"]
-    selected_lon = map_data["last_clicked"]["lng"]
-
-    st.success("📍 Location Selected")
-
-    st.write(f"**Latitude:** {selected_lat:.6f}")
-    st.write(f"**Longitude:** {selected_lon:.6f}")
-
-    st.header("📊 Flood Prediction Result")
-
-    st.write(
-        f"📍 **Selected Location:** "
-        f"{selected_lat:.6f}, {selected_lon:.6f}"
-    )
-
-    st.write(f"🌊 **Flood Risk:** {probability * 100:.2f}%")
-
-    if probability >= 0.65:
-        st.error("🚨 HIGH FLOOD RISK")
-    elif probability >= 0.35:
-        st.warning("⚠️ MEDIUM FLOOD RISK")
-    else:
-        st.success("✅ LOW FLOOD RISK")
-
-else:
-    st.info("👆 Please click on the map to select a location.")
-
-st.header("💡 Recommended Action")
-if probability >= 0.65:
-    st.markdown("""
+st.write(f"**Latitude:** {st.session_state.selected_lat:.6f}")
+st.write(f"**Longitude:** {st.session_state.selected_lon:.6f}")
     1. 🚨 Issue an early flood warning.
     2. 🚧 Monitor low-lying roads.
     3. 🚰 Check drainage blockages.
