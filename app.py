@@ -97,16 +97,24 @@ risk_colors = {
     "Low": "green"
 }
 
-for _, row in zones.iterrows():
-    folium.CircleMarker(
-        location=[row["Latitude"], row["Longitude"]],
-        radius=10,
-        color=risk_colors[row["Risk"]],
-        fill=True,
-        fill_color=risk_colors[row["Risk"]],
-        fill_opacity=0.8,
-        popup=f"{row['Area']} - {row['Risk']} Risk"
-    ).add_to(m)
+selected_zone = st.selectbox("📍 Select Area", zones["Area"])
+
+selected = zones[zones["Area"] == selected_zone].iloc[0]
+
+m = folium.Map(
+    location=[selected["Latitude"], selected["Longitude"]],
+    zoom_start=15
+)
+
+folium.CircleMarker(
+    location=[selected["Latitude"], selected["Longitude"]],
+    radius=15,
+    color=risk_colors[selected["Risk"]],
+    fill=True,
+    fill_color=risk_colors[selected["Risk"]],
+    fill_opacity=0.8,
+    popup=f"{selected['Area']} - {selected['Risk']} Risk"
+).add_to(m)
 
 st_folium(m, width=1000, height=500)
 
