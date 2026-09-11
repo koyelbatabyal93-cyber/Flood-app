@@ -124,21 +124,27 @@ st.success("📍 Location Selected")
 
 st.write(f"**Latitude:** {st.session_state.selected_lat:.6f}")
 st.write(f"**Longitude:** {st.session_state.selected_lon:.6f}")
-    1. 🚨 Issue an early flood warning.
-    2. 🚧 Monitor low-lying roads.
-    3. 🚰 Check drainage blockages.
-    4. 📡 Monitor water levels continuously.
-    """)
+    st.header("💡 Recommended Action")
+
+if probability >= 0.65:
+    st.markdown("""
+1. 🚨 Issue an early flood warning.
+2. 🚧 Monitor low-lying roads.
+3. 🚰 Check drainage blockages.
+4. 📡 Monitor water levels continuously.
+""")
+
 elif probability >= 0.35:
     st.markdown("""
-    1. 👀 Continue monitoring rainfall.
-    2. 🚰 Check drainage systems.
-    3. 📊 Update flood prediction regularly.
-    """)
+1. 👀 Continue monitoring rainfall.
+2. 🚰 Check drainage systems.
+3. 📊 Update flood prediction regularly.
+""")
+
 else:
     st.markdown("""
-    1. ✅ Continue normal monitoring.
-    2. 🌧️ Track upcoming rainfall.
-    """)
+1. ✅ Continue normal monitoring.
+2. 🌧️ Track upcoming rainfall.
+""")
 
 st.caption("Prototype for Urban Flood Nowcasting — Drainage and Rainfall Coupling")
